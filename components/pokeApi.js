@@ -1,23 +1,24 @@
-export default function getPokeData(offset) {
-    const $main = document.querySelector("main");
-    let $loader = document.querySelector('.loader'),
-    $pags = document.querySelector("#pags");
-    $pags.textContent = `Pokemons ${offset} - ${offset + 20}`;
+export default function getPokeData(url) {
+    const $main = document.querySelector("main"),
+    $backBtn = document.querySelector('#back'),
+    $nextBtn = document.querySelector('#next');
+    let $loader = document.querySelector('.loader');
 
+    $loader.classList.remove('none');
 
-
-    fetch(`https://pokeapi.co/api/v2/pokemon?limit=20&offset=${offset}`)
+    fetch(`${url}`)
     .then(response => response.ok ? response.json() : Promise.reject(response))
     .then(json => {
-        
+        $backBtn.dataset.link = json.previous;
+        $nextBtn.dataset.link = json.next;
         const fragment = new DocumentFragment();
-        
         json.results.forEach(el => {
-            let url = el.url.slice(25, -1);
-            const imgSource = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites${url}.png`;
             const img = document.createElement('img');
-            img.setAttribute('src', imgSource);
-            img.setAttribute('alt', el.name);
+            fetch(`${el.url}`)
+            .then(res => res.ok ? res.json() : Promise.reject(res))
+            .then(pokeData => {
+                img.setAttribute('src', pokeData.sprites.front_default);
+            });
             fragment.append(img);
         })
             $loader.classList.add('none');
@@ -25,8 +26,7 @@ export default function getPokeData(offset) {
         })
     .catch(err => {
         console.log(err);
-        msg = err.statusText || "Undefined problem";
+        let msg = err.statusText || "Undefined problem";
         $main.innerHTML = `Error: ${err.status}: ${msg}`;
     });
-
 };

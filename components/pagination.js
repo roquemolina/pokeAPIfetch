@@ -1,30 +1,40 @@
 import getPokeData from "./pokeApi.js";
-let startPag = 0;
-let $loader = document.querySelector('.loader');
+let $main = document.querySelector("main"),
+$backBtn = document.querySelector('#back'),
+$nextBtn = document.querySelector('#next'),
+$pags = document.querySelector("#pags"),
+pokeF = 0,
+pokeL = 20;
 
-const $main = document.querySelector("main");
+$pags.textContent = `Pokemons ${pokeF} to ${pokeL}`;
+
+
 export default function pagination(e) {
 
     if(e.target == document.getElementById('back')) {
-        if(startPag === 0){
+        if($backBtn.dataset.link === "null"){
             console.log('Last page');
-        } else if (startPag > 0) {
+            alert('Last page');
+            
+        } else {
             $main.innerHTML = '';
-            $loader.classList.remove('none');
-            startPag -= 20;
-            getPokeData(startPag);
+            getPokeData($backBtn.dataset.link);
+            pokeF -= 20;
+            pokeL -= 20;
+            $pags.textContent = `Pokemons ${pokeF} to ${pokeL}`;
         };
     };
 
     if(e.target == document.getElementById('next')) {
-        if(startPag === 80){
+        if($nextBtn.dataset.link === "null"){
             console.log('Last page');
-        } else if (startPag <80) {
-            startPag += 20;
+            alert('Last page');
+        } else {
             $main.innerHTML = '';
-            $loader.classList.remove('none');
-            getPokeData(startPag);
-
+            getPokeData($nextBtn.dataset.link);
+            pokeF += 20;
+            pokeL += 20;
+            $pags.textContent = `Pokemons ${pokeF} to ${pokeL}`;
         };
     }
 };
